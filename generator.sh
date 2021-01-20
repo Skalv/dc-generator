@@ -73,7 +73,7 @@ networks:
 " >$DIR/docker-compose-mysql${ID_CONTAINER}.yml
 
   echo "2 - Run mysql"
-  /usr/local/bin/docker-compose -f $DIR/docker-compose-mysql${ID_CONTAINER}.yml up -d
+  docker-compose -f $DIR/docker-compose-mysql${ID_CONTAINER}.yml up -d
 }
 
 postgres() {
@@ -116,7 +116,7 @@ networks:
 " >$DIR/docker-compose-postgres${ID_CONTAINER}.yml
 
   echo "2 - Run postgres"
-  /usr/local/bin/docker-compose -f $DIR/docker-compose-postgres${ID_CONTAINER}.yml up -d
+  docker-compose -f $DIR/docker-compose-postgres${ID_CONTAINER}.yml up -d
 
   echo "
   Credentials:
@@ -132,7 +132,7 @@ networks:
 clean(){
   NAME_CONTENEUR=$1
   [ -z ${NAME_CONTENEUR} ] && exit 1
-  /usr/local/bin/docker-compose -f $DIR/docker-compose-${NAME_CONTENEUR}.yml down
+  docker-compose -f $DIR/docker-compose-${NAME_CONTENEUR}.yml down
   #[ ! -z ${NAME_CONTENEUR} ] && rm -rf $DIR/${NAME_CONTENEUR}
   rm -f $DIR/docker-compose-${NAME_CONTENEUR}.yml
   docker volume prune -f
