@@ -51,8 +51,8 @@ services:
     - MYSQL_USER=user
     - MYSQL_PASSWORD=1234
     - TZ=Europe/Paris
-    ports:
-    - 3306:3306
+    expose:
+    - 3306
     networks:
     - generator
     volumes:
