@@ -19,8 +19,11 @@ Options:
   -p, --postgres [ID if you want]
     run postgres
 
-  -m, --mysql [ID if you want]
+  --mysql [ID if you want]
     run mysql
+
+  --mariadb [ID if you want]
+    run mariadb
 
   --clean [container name]
     remove container and datas
@@ -74,6 +77,51 @@ networks:
 
   echo "2 - Run mysql"
   docker-compose -f $DIR/docker-compose-mysql${ID_CONTAINER}.yml up -d
+}
+
+mariadb() {
+  echo
+  echo "Install Mariadb"
+  echo ""
+  [ ! -z $1 ] && echo "Création du conteneur : mariadb${1}" && ID_CONTAINER=$1 && echo ""
+  echo "1 - Create directories ${DIR}/mariadb${ID_CONTAINER}/"
+  mkdir -p $DIR/mariadb${ID_CONTAINER}/
+
+  echo "
+version: '3.0'
+services:
+  mariadb${ID_CONTAINER}:
+    image: mariadb
+    container_name: mariadb${ID_CONTAINER}
+    environment:
+    - MYSQL_ROOT_PASSWORD=12345678
+    - MYSQL_DATABASE=test
+    - MYSQL_USER=user
+    - MYSQL_PASSWORD=1234
+    - TZ=Europe/Paris
+    expose:
+    - 3306
+    networks:
+    - generator
+    volumes:
+    - mariadb_data${ID_CONTAINER}:/var/lib/mysql
+volumes:
+  mariadb_data${ID_CONTAINER}:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${DIR}/mariadb${ID_CONTAINER}
+networks:
+  generator:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.168.0/24
+" >$DIR/docker-compose-mariadb${ID_CONTAINER}.yml
+
+  echo "2 - Run mariadb"
+  docker-compose -f $DIR/docker-compose-mariadb${ID_CONTAINER}.yml up -d
 }
 
 postgres() {
@@ -157,6 +205,10 @@ while getopts "$optspec" optchar; do
           arg="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
           mysql "$arg"
           ;;
+        mariadb)
+          arg="${!OPTIND}"; OPTIND=$(( $OPTIND + 1 ))
+          mariadb "$arg"
+          ;;
         ip)
           ip
           ;;
@@ -171,7 +223,6 @@ while getopts "$optspec" optchar; do
       ;;
     i)	ip ;;
     p)	postgres ;;
-    m)  mysql ;;
     h)	help_list ;;
     *)	echo "Erreur reportez-vous à l'aide"
     help_list ;;
